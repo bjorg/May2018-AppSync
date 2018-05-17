@@ -11,12 +11,25 @@ using Amazon.Lambda.Core;
 
 namespace CurrencyConversion {
 
-    public class Request {
+    public class OrderDetails {
 
         //--- Fields ---
         public int Quantity;
         public double UnitPrice;
-        public string Currency;
+        public double Discount;
+    }
+
+    public class Conversion {
+
+        //--- Fields ---
+        public string currency;
+    }
+
+    public class Request {
+
+        //--- Fields ---
+        public OrderDetails source;
+        public Conversion arguments;
     }
 
     public class Function {
@@ -26,18 +39,21 @@ namespace CurrencyConversion {
 
         //--- Methods ---
         public async Task<object> FunctionHandlerAsync(Request input, ILambdaContext context) {
-            var key = $"USD_{input.Currency}";
-            using(var response = await HttpClient.SendAsync(new HttpRequestMessage {
-                RequestUri =  new Uri($"http://free.currencyconverterapi.com/api/v5/convert?q={key}&compact=y"),
-                Method = HttpMethod.Get
-            })) {
-                var rate = (double)Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync())[key].val;
-                return new {
-                    Rate = rate,
-                    Exchange = key,
-                    Total = input.Quantity * input.UnitPrice * rate
-                };
+            double rate = 1.0;
+            var key = $"USD_{input.arguments.currency ?? "USD"}";
+            if((input.arguments.currency != null) && (input.arguments.currency != "USD")) {
+                using(var response = await HttpClient.SendAsync(new HttpRequestMessage {
+                    RequestUri =  new Uri($"http://free.currencyconverterapi.com/api/v5/convert?q={key}&compact=y"),
+                    Method = HttpMethod.Get
+                })) {
+                    rate = (double)Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync())[key].val;
+                }
             }
+            return new {
+                Rate = rate,
+                Exchange = key,
+                Total = (input.source.Quantity * input.source.UnitPrice * rate) - input.source.Discount
+            };
         }
     }
 }
