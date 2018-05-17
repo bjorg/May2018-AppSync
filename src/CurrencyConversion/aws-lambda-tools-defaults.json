@@ -14,6 +14,7 @@
   "framework" : "netcoreapp2.0",
   "function-runtime":"dotnetcore2.0",
   "function-memory-size" : 256,
+  "function-name" : "lambdasharp-order-currency-converter",
   "function-timeout" : 30,
-  "function-handler" : "CurrencyConversion::CurrencyConversion.Function::FunctionHandler"
+  "function-handler" : "CurrencyConversion::CurrencyConversion.Function::FunctionHandlerAsync"
 }

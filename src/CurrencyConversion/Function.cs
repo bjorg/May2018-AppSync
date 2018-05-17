@@ -31,7 +31,7 @@ namespace CurrencyConversion {
                 RequestUri =  new Uri($"http://free.currencyconverterapi.com/api/v5/convert?q={key}&compact=y"),
                 Method = HttpMethod.Get
             })) {
-                var rate = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
+                var rate = (double)Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync())[key].val;
                 return new {
                     Rate = rate,
                     Exchange = key,
