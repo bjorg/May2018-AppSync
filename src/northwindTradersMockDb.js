@@ -7731,34 +7731,38 @@ exports.handler = (event, context, callback) => {
   }
 ];
 
-  switch (event.field) {
+switch (event.field) {
     case "allCustomers":
-      callback(null, customers);
-      break;
+        callback(null, customers);
+        break;
     case "getCustomer":
         var id = event.arguments.id;
         callback(null, customers.find(customer => customer.CustomerID == id));
         break;
     case "getCustomerOrders":
-      var id = event.source.CustomerID;
-      callback(null, orders.filter(order => order.CustomerID  === id));
-      break;
+        var id = event.source.CustomerID;
+        callback(null, orders.filter(order => order.CustomerID === id));
+        break;
     case "allEmployees":
-      callback(null, employees);
-      break;
+        callback(null, employees);
+        break;
     case "getEmployee":
-        var id = event.source.EmployeeID;
+        var id = event.arguments.id;
         callback(null, employees.find(employee => employee.EmployeeID == id));
         break;
     case "updateOrder":
-      callback(null, event.arguments);
-      var id = event.arguments.OrderID;
-      var order = orders.filter(order => order.OrderID === id);
-      order.ShippedDate = event.arguments.ShippedDate;
-      callback(null, order);
-      break;
+        callback(null, event.arguments);
+        var id = event.arguments.OrderID;
+        var order = orders.filter(order => order.OrderID === id);
+        order.ShippedDate = event.arguments.ShippedDate;
+        callback(null, order);
+        break;
+    case "getEmployeeOrders":
+        var id = event.source.EmployeeID;
+        callback(null, orders.filter(order => order.EmployeeID === id));
+        break;
     default:
-    callback("Unknown field, unable to resolve" + event.field, null);
-    break;
+        callback("Unknown field, unable to resolve" + event.field, null);
+        break;
   }
 };
