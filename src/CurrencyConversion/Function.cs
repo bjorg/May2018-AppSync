@@ -29,7 +29,7 @@ namespace CurrencyConversion {
     public class Request {
 
         //--- Fields ---
-        public OrderDetails source;
+        public OrderDetails[] source;
         public Conversion arguments;
     }
 
@@ -51,7 +51,7 @@ namespace CurrencyConversion {
                     rate = (double)JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync())[key].val;
                 }
             }
-            var result = (input.source.Quantity * input.source.UnitPrice * rate) - input.source.Discount;
+            var result = input.source.Sum(item => (item.Quantity * item.UnitPrice * rate) - item.Discount);
             LambdaLogger.Log($"*** INFO: result = {JsonConvert.SerializeObject(result)}");
             return result;
         }
